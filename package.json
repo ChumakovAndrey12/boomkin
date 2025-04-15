@@ -1,0 +1,25 @@
+{
+  "name": "boomkin",
+  "version": "0.0.1",
+  "description": "cli chat",
+  "main": "main.js",
+  "scripts": {
+    "test": "eslint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChumakovAndrey12/boomkin.git"
+  },
+  "keywords": [
+    "cli",
+    "chat",
+    "node",
+    "js"
+  ],
+  "author": "Chuamakov Andrew",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ChumakovAndrey12/boomkin/issues"
+  },
+  "homepage": "https://github.com/ChumakovAndrey12/boomkin#readme"
+}
