@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/ChumakovAndrey12/boomkin/issues"
   },
-  "homepage": "https://github.com/ChumakovAndrey12/boomkin#readme"
+  "homepage": "https://github.com/ChumakovAndrey12/boomkin#readme",
+  "dependencies": {
+    "ws": "^8.18.1"
+  }
 }
