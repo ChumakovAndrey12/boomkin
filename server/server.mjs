@@ -12,6 +12,12 @@ function main() {
 
 	const clients = [];
 
+	const broadcast = (data, clients, senderId) => 
+		clients.forEach(client => {
+			const { id } = client
+			if( id !== senderId ) client.send(data);
+		});
+
 	wsServer.on('connection',(conection, request) => {
 
 		conection.id = uuidv4();
@@ -25,10 +31,20 @@ function main() {
 		
 		conection.on('error', console.error);
 		conection.on('message', data => {
-			clients.forEach(client => {
-				if( conection !== client ) client.send(data);
-			});
-		});
+			const {type, userData} = JSON.parse(data);
+
+			if(type === 'init') {
+				conection.userData = userData;
+
+				const data = JSON.stringify({
+					type,
+					userData: { message: 'joined', ...userData},
+				});
+
+				broadcast(data, clients, conection.id); 
+			};
+
+	});
 	});
 
 	server.on('upgrade', (request, socket, head) => {
