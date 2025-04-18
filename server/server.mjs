@@ -1,7 +1,9 @@
 'use strict'
 
 import { createServer } from 'http';
+
 import { WebSocketServer } from 'ws';
+import { v4 as uuidv4 } from 'uuid';
 
 function main() {
 
@@ -11,14 +13,20 @@ function main() {
 	const clients = [];
 
 	wsServer.on('connection',(conection, request) => {
+
+		conection.id = uuidv4();
 		clients.push(conection);
+
+
 		const ip = request.socket.remoteAddress;
 		const path = request.url;
-  		console.log('🟢 Connection from IP:', ip, 'on path[ ', path, ' ]');
+  		console.log('connection from IP:', ip, 'on path[ ', path, ' ]'); // TODO сделать реализацию юай с 3 последними подключениями и кол-вом конекшенов.
+
+		
 		conection.on('error', console.error);
 		conection.on('message', data => {
 			clients.forEach(client => {
-				if( conection !== client ) client.send(data)
+				if( conection !== client ) client.send(data);
 			});
 		});
 	});
@@ -38,6 +46,7 @@ function main() {
 
 	server.listen(8080);
 	console.log('Server is running.');
+	
 };
 
 main();
