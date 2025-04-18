@@ -44,6 +44,9 @@ socket.on('error', (err) => {
 });
 
 rl.on('line', str => {
-	if(str == 'exit') rl.close();
+	if(str == 'exit') {
+		socket.close();
+		rl.close();
+	};
 	socket.send(JSON.stringify([client, str]));
 });
