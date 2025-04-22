@@ -11,12 +11,18 @@ function main() {
 	const wsServer = new WebSocketServer({noServer: true});
 
 	const clients = [];
-
+	const rooms = new Set(['/main']);
+	
 	const broadcast = (data, clients, senderId) => 
 		clients.forEach(client => {
 			const { id } = client
 			if( id !== senderId ) client.send(data);
 		});
+
+	const routing = (path, upgradeConnection, rejectConnection) => {
+		if (rooms.has(path)) upgradeConnection();
+		else rejectConnection();
+    	};
 
 	wsServer.on('connection',(conection, request) => {
 
@@ -48,16 +54,17 @@ function main() {
 	});
 
 	server.on('upgrade', (request, socket, head) => {
-  		const { pathname } = new URL(request.url, 'wss://base.url');
+  		const { pathname } = new URL(request.url, 'wss://localhost.url');
 
-  		if (pathname === '/chat') {
-    			wsServer.handleUpgrade(request, socket, head, (ws, request) =>  {
-      				wsServer.emit('connection', ws, request);
-    			});
-  		}
-  		else {
-    			socket.destroy();
- 		}
+		routing(
+			pathname, 
+			() => wsServer.handleUpgrade(
+				request, 
+				socket, 
+				head, 
+				(ws, request) => wsServer.emit('connection', ws, request)),
+			() => socket.destroy()
+		);
 	});
 
 	server.listen(8080);
