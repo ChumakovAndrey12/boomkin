@@ -3,36 +3,34 @@ import WebSocket from 'ws';
 import * as readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
 
+const messageTypes = {
+	CLIENT_CONNECTED: 'client-connected',
+        CLIENT_DISCONNECTED: 'client-disconnected',
+        USER_CONNECTED: 'user-connected',
+        USER_DISCONNECTED: 'user-disconnected',
+};
 
-const socket = new WebSocket('ws://localhost:8080/chat');
+const socket = new WebSocket('ws://localhost:8080/main');
 const rl = readline.createInterface({ input, output });
 
-const client = '@user';
-
-
-function isJSON(str) {
-  try {
-    const parsed = JSON.parse(str);
-    return typeof parsed === 'object' && parsed !== null;
-  } catch (e) {
-    return false;
-  }
-}
-
+const client = 'user';
 
 socket.on('open', () => {
-	socket.send(client + ' joined.');
+	const initData = JSON.stringify({
+		type: 'init',
+		userData: {
+			userName: client,
+			userTipe: 'guest',
+			timestamp: Date.now(),
+		}
+	});
+
+	socket.send(initData);
 });
 
 socket.on('message', (data) => {
-	const message = data.toString();
-
-	if(isJSON(message)) {
-		const [userName, str]  = JSON.parse(message);
-		console.log(userName + ': ' + str);
-	} else {
-		console.log('str: ' + message);
-	}
+		const { type, userData: {userName, message, timestamp} }  = JSON.parse(data);
+		console.log('@' + userName, message)
 });
 
 socket.on('close', (code, reason) => {
@@ -48,5 +46,5 @@ rl.on('line', str => {
 		socket.close();
 		rl.close();
 	};
-	socket.send(JSON.stringify([client, str]));
+	socket.send(JSON.stringify({type: 'message', userData: {userName: client, message: str}}));
 });
